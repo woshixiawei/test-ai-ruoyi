@@ -1,0 +1,83 @@
+server:
+  port: 8080
+  shutdown: graceful  # 优雅关闭，等待活跃请求完成
+
+spring:
+  application:
+    name: testruoyi-server
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test_ruoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false&rewriteBatchedStatements=true
+    username: root
+    password: YOUR_DB_PASSWORD
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: TestRuoYiHikariPool
+      minimum-idle: 5          # 最小空闲连接数
+      maximum-pool-size: 20    # 最大连接数（默认50过大，20足够一般业务）
+      connection-timeout: 30000   # 获取连接超时时间(ms)
+      idle-timeout: 600000       # 空闲连接超时时间(ms)，10分钟
+      max-lifetime: 1800000      # 连接最大存活时间(ms)，30分钟
+      connection-test-query: SELECT 1  # 连接有效性检测
+
+  # Redis配置（sa-token-redisson依赖）
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: YOUR_REDIS_PASSWORD
+      database: 0
+      timeout: 10000ms
+
+  # Jackson日期格式配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null  # 序列化忽略null字段
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: is_deleted
+      logic-delete-value: id    # ID型软删除：删除时SET is_deleted = id（MySQL列引用，非固定值）
+      logic-not-delete-value: 0  # 查询时自动追加 WHERE is_deleted = 0
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# sa-token配置
+sa-token:
+  token-name: Authorization
+  timeout: 1800
+  activity-timeout: -1
+  is-concurrent: false
+  is-share: false
+  token-style: uuid
+  is-log: true
+
+# Knife4j配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# 日志配置
+logging:
+  level:
+    com.xiawei.testruoyi.learn.server: info
